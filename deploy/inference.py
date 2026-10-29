@@ -42,7 +42,7 @@ class OnnxDetector:
         out[top:top + nh, left:left + nw] = resized
         return out, r, left, top
 
-    def __call__(self, bgr, conf=0.25, iou=0.7, max_det=300):
+    def __call__(self, bgr, conf=0.25, iou=0.7, max_det=300, agnostic=False):
         h0, w0 = bgr.shape[:2]
         lb, r, left, top = self._letterbox(bgr)
         x = lb[:, :, ::-1].transpose(2, 0, 1)[None].astype(np.float32) / 255.0  # BGR->RGB, CHW
@@ -59,8 +59,8 @@ class OnnxDetector:
         xyxy[:, 1] = boxes[:, 1] - boxes[:, 3] / 2
         xyxy[:, 2] = boxes[:, 0] + boxes[:, 2] / 2
         xyxy[:, 3] = boxes[:, 1] + boxes[:, 3] / 2
-        # per-class NMS via class offset (same trick ultralytics uses)
-        offset = cls[:, None].astype(np.float32) * 7680.0
+        # per-class NMS via class offset (same trick ultralytics uses); agnostic = one label per box
+        offset = 0.0 if agnostic else cls[:, None].astype(np.float32) * 7680.0
         nms_boxes = xyxy + offset
         wh = nms_boxes[:, 2:] - nms_boxes[:, :2]
         idx = cv2.dnn.NMSBoxes(np.concatenate([nms_boxes[:, :2], wh], 1).tolist(), scores.tolist(), conf, iou)
@@ -96,10 +96,23 @@ def assign_tooth(box, teeth):
     return best, round(score, 3)
 
 
+def unique_teeth(teeth):
+    """A chart has each FDI number at most once: keep the most confident box per number."""
+    seen, out = set(), []
+    for t in sorted(teeth, key=lambda t: -t["confidence"]):
+        if t["label"] not in seen:
+            seen.add(t["label"])
+            out.append(t)
+    return out
+
+
 def chart(teeth_model, diag_model, image_bytes, conf=0.25, iou=0.7):
     img = preprocess(image_bytes)
-    teeth = teeth_model(img, conf=conf, iou=iou)
-    findings = diag_model(img, conf=conf, iou=iou)
+    # teeth: class-agnostic NMS (one number per tooth box), then one box per number
+    teeth = unique_teeth(teeth_model(img, conf=conf, iou=iou, agnostic=True))
+    teeth.sort(key=lambda t: t["label"])
+    # findings: class-agnostic too, so one lesion isn't reported as both caries and deep caries
+    findings = diag_model(img, conf=conf, iou=iou, agnostic=True)
     for f in findings:
         f["tooth"], f["overlap"] = assign_tooth(f["box"], teeth)
         f["diagnosis"] = f.pop("label")

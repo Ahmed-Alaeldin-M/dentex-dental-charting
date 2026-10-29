@@ -128,6 +128,10 @@ Response shape (values are illustrative):
 }
 ```
 
+Measured on the deployed endpoint: about 1.3 s per panoramic X-ray (2850 x 1316) for both models on 2 CPU cores.
+
+Post-processing for the chart: class-agnostic NMS, so one box gets one label, and each FDI number is kept at most once (the most confident box). Without this the raw detector can return the same tooth as both 17 and 18.
+
 Research demo only, not a medical device.
 
 ## Data and license
