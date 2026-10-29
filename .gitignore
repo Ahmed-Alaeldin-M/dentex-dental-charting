@@ -1,0 +1,8 @@
+*.pt
+*.onnx
+runs/
+yolo_teeth/
+yolo_diag/
+dentex/
+__pycache__/
+.ipynb_checkpoints/
