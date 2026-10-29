@@ -10,6 +10,8 @@ Tooth 36: Caries (0.62)
 Tooth 48: Impacted (0.77)
 ```
 
+![Charted panoramic X-ray: green boxes are numbered teeth, red are impacted teeth, orange and yellow are caries and deep caries](assets/chart_example.jpg)
+
 Both models are exported to ONNX and checked with ONNX Runtime.
 
 Built on the [DENTEX](https://huggingface.co/datasets/ibrahimhamamci/DENTEX) dataset from the MICCAI 2023 challenge: panoramic X-rays from three hospitals with different machines and protocols.
@@ -64,7 +66,12 @@ This is not a like-for-like comparison. The challenge numbers come from the offi
 
 Impacted teeth are large, high-contrast shapes, so they are easy. Caries are small and subtle, the line between caries and deep caries is partly a matter of clinical judgment, and periapical lesions have only 133 training examples. Panoramic X-rays are also not the best view for caries; bitewings are.
 
+The tooth model also struggles on heavily restored mouths. On the X-ray below (crowns, a bridge, implants and missing teeth) it produces overlapping boxes and shifts the numbering on the lower right side, because the gaps break the "count from the midline" pattern it learned.
+
+![Failure case: overlapping and shifted tooth numbers on a mouth with crowns, implants and missing teeth](assets/failure_case_restorations.jpg)
+
 Next steps:
+- Handle missing teeth and restorations explicitly: suppress overlapping tooth boxes per FDI number and check that numbering stays in order along each arch.
 - Two-stage pipeline: crop each tooth with the numbering model, then classify findings on the crop at higher resolution.
 - More data for the rare classes, plus class-weighted loss.
 - Tune the confidence threshold toward recall, since a missed lesion is worse than a false flag that a dentist rejects.
