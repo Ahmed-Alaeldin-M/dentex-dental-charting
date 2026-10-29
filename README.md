@@ -87,6 +87,49 @@ The notebook is written for Kaggle:
 
 It also runs on a single GPU; the two models then train one after the other.
 
+## API (Modal, CPU, ONNX Runtime)
+
+`deploy/` serves both ONNX models behind a FastAPI endpoint on [Modal](https://modal.com). It runs on CPU only and uses ONNX Runtime with its own letterbox, YOLOv8 decoding and NMS, so the container has no PyTorch or Ultralytics and starts fast.
+
+| Endpoint | What it returns |
+|---|---|
+| `GET /health` | Status and loaded class names |
+| `POST /predict` | JSON: dental chart lines, findings with FDI tooth + confidence + box, all detected teeth, inference time |
+| `POST /predict/image` | The X-ray with numbered teeth and findings drawn on it (JPEG) |
+
+Both POST endpoints take the X-ray as a multipart `file` and optional `conf` (default 0.25) and `iou` (default 0.7) query parameters.
+
+Deploy:
+
+```bash
+pip install modal
+modal setup
+modal volume create dentex-models
+modal volume put dentex-models teeth_yolov8s.onnx /teeth_yolov8s.onnx
+modal volume put dentex-models diag_yolov8s.onnx /diag_yolov8s.onnx
+modal deploy deploy/modal_app.py
+```
+
+Call it:
+
+```bash
+curl -X POST "https://<your-modal-url>/predict" -F "file=@panoramic.png"
+curl -X POST "https://<your-modal-url>/predict/image" -F "file=@panoramic.png" -o charted.jpg
+```
+
+Response shape (values are illustrative):
+
+```json
+{
+  "teeth_detected": 28,
+  "chart": ["Tooth 36: Caries (0.62)", "Tooth 48: Impacted (0.77)"],
+  "findings": [{"tooth": "36", "diagnosis": "Caries", "confidence": 0.62, "overlap": 0.94, "box": [1251, 492, 1437, 697]}],
+  "inference_ms": 1850
+}
+```
+
+Research demo only, not a medical device.
+
 ## Data and license
 
 DENTEX is released under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) for non-commercial research. This repo contains no images from the dataset.
