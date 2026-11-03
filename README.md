@@ -30,13 +30,13 @@ Built on the [DENTEX](https://huggingface.co/datasets/ibrahimhamamci/DENTEX) dat
 
 **Diagnosis model** (105 X-rays, 512 findings)
 
-| Class | Precision | Recall | F1 | mAP@0.5 | mAP@0.5:0.95 |
+| Class | Precision | Recall | F1 | 
 |---|---|---|---|---|---|
-| Impacted | 0.849 | 0.910 | 0.878 | 0.916 | 0.569 |
-| Deep caries | 0.638 | 0.463 | 0.537 | 0.564 | 0.364 |
-| Caries | 0.467 | 0.536 | 0.499 | 0.529 | 0.383 |
-| Periapical lesion | 0.576 | 0.440 | 0.499 | 0.406 | 0.260 |
-| **All** | **0.633** | **0.587** | **0.609** | **0.604** | **0.394** |
+| Impacted | 0.849 | 0.910 | 0.878 |
+| Deep caries | 0.638 | 0.463 | 0.537 |
+| Caries | 0.467 | 0.536 | 0.499 | 
+| Periapical lesion | 0.576 | 0.440 | 0.499 | 
+| **All** | **0.633** | **0.587** | **0.609** | 
 
 **Tooth numbering model** (95 X-rays, 2,771 teeth)
 
