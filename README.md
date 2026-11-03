@@ -113,8 +113,8 @@ modal deploy deploy/modal_app.py
 Call it:
 
 ```bash
-curl -X POST "https://<your-modal-url>/predict" -F "file=@panoramic.png"
-curl -X POST "https://<your-modal-url>/predict/image" -F "file=@panoramic.png" -o charted.jpg
+curl -X POST "https://khaleedlaqomy34530-game--dentex-dental-charting-dentalch-2724ac.us-east.modal.run/predict" -F "file=@panoramic.png"
+curl -X POST "https://khaleedlaqomy34530-game--dentex-dental-charting-dentalch-2724ac.us-east.modal.run/predict/image" -F "file=@panoramic.png" -o charted.jpg
 ```
 
 Response shape (values are illustrative):
