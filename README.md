@@ -31,7 +31,7 @@ Built on the [DENTEX](https://huggingface.co/datasets/ibrahimhamamci/DENTEX) dat
 **Diagnosis model** (105 X-rays, 512 findings)
 
 | Class | Precision | Recall | F1 | 
-|---|---|---|---|---|---|
+|---|---|---|---|
 | Impacted | 0.849 | 0.910 | 0.878 |
 | Deep caries | 0.638 | 0.463 | 0.537 |
 | Caries | 0.467 | 0.536 | 0.499 | 
